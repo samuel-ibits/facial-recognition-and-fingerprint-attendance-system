@@ -2,7 +2,10 @@ python -m venv venv/
 
 venv\Scripts\activate
 
-pip3 install flask gunicorn
+pip3 install flask gunicorn openpyxl
+cmake
+dlib
+pip3 install face_recognition -vvv
 
 in .gitignore add
  /venv

@@ -11,6 +11,8 @@ npm install
 expo start
 
 # api-
+# to run  follow procedure in api/process.txt
+
 contains the api that uterlizes powerfull python libraries  perform facial and fingerprint detection 
 
 face_recognition: The face_recognition library is a user-friendly and widely used library that provides a high-level interface for facial recognition tasks. It uses dlib's state-of-the-art face recognition algorithm, which is based on deep learning techniques. It supports face detection, face recognition, and face landmarks estimation

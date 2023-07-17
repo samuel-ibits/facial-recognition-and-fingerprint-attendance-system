@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 from openpyxl import Workbook, load_workbook
 import face_recognition
@@ -6,6 +5,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 excel_file = 'attendance_report.xlsx'
+
 
 # Endpoint for registering a new user
 @app.route('/register', methods=['POST'])
@@ -24,7 +24,6 @@ def register():
     # Return a success message
     response = {'message': 'User registered successfully'}
     return jsonify(response), 200
-
 # Endpoint for recognizing a face and marking attendance
 @app.route('/recognize', methods=['POST'])
 def recognize():
@@ -50,6 +49,8 @@ def recognize():
         response = {'error': 'Face not recognized'}
         return jsonify(response), 404
 
+
+
 # Endpoint for viewing the attendance report
 @app.route('/attendance', methods=['GET'])
 def view_attendance():
@@ -60,6 +61,8 @@ def view_attendance():
     response = {'attendance': attendance_data}
     return jsonify(response), 200
 
+
+#Other modules
 def save_registration_details(matric_no, name, department):
     # Load the workbook or create a new one if it doesn't exist
     try:
@@ -97,6 +100,87 @@ def perform_facial_recognition(image):
             # Match found, return the user details
             return user
 
-# def mark_attendance(matric_no, name, department):
+
+def load_registered_users():
+    registered_users = []
+
+    # Load the workbook
+    try:
+        workbook = load_workbook(excel_file)
+    except FileNotFoundError:
+        return registered_users
+
+    # Select the active sheet (first sheet by default)
+    sheet = workbook.active
+
+    # Iterate over the rows in the sheet and extract the registered user data
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        user = {
+            'MATRIC. NO.': row[1],
+            'NAME': row[2],
+            'DEPARTMENT': row[3],
+            'encoding': [],  # Add the facial encoding for each user
+            'STATUS': row[5],
+            'TIMESTAMP': row[6],
+        }
+        registered_users.append(user)
+
+    return registered_users
 
 
+def mark_attendance(matric_no, name, department):
+    # Load the workbook
+    try:
+        workbook = load_workbook(excel_file)
+    except FileNotFoundError:
+        print(f"Error: {excel_file} not found.")
+        return
+
+    # Select the active sheet (first sheet by default)
+    sheet = workbook.active
+
+    # Find the row corresponding to the user based on the MATRIC. NO.
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        if row[1] == matric_no:
+            # Increment the attendance status by 1
+            status = row[5]
+            new_status = status + 1
+            
+            # Update the STATUS field with the incremented value
+            sheet.cell(row=row[0], column=6, value=new_status)
+            
+            # Update the TIMESTAMP field with the current date and time
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            sheet.cell(row=row[0], column=7, value=timestamp)
+            
+            # Save the workbook
+            workbook.save(excel_file)
+            print(f"Attendance marked for {name} ({matric_no}), {department}.")
+            return
+
+    print(f"User with MATRIC. NO. {matric_no} not found in the registration details.")
+def load_attendance_data():
+    attendance_data = []
+
+    # Load the workbook
+    try:
+        workbook = load_workbook(excel_file)
+    except FileNotFoundError:
+        print(f"Error: {excel_file} not found.")
+        return attendance_data
+
+    # Select the active sheet (first sheet by default)
+    sheet = workbook.active
+
+    # Iterate over the rows in the sheet and extract the attendance data
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        user_data = {
+            'MATRIC. NO.': row[1],
+            'NAME': row[2],
+            'DEPARTMENT': row[3],
+            'STATUS': row[5],
+            'TIMESTAMP': row[6],
+        }
+        attendance_data.append(user_data)
+
+    return attendance_data
