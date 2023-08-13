@@ -1,5 +1,6 @@
 # Facial recognition and fingerprint attendance system
 UI design
+https://www.figma.com/file/1ly0ehvFwLP0GWJdmYn7Bv/Final-year-projects?type=design&node-id=0%3A1&t=8xryCZi69VxNZNIs-1
 
 # directories
 # app-
