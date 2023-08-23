@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 from openpyxl import Workbook, load_workbook
-import face_recognition
+# import face_recognition
 from datetime import datetime
+import cv2
+import numpy as np
 
 app = Flask(__name__)
 excel_file = 'attendance_report.xlsx'
@@ -24,7 +26,67 @@ def register():
     # Return a success message
     response = {'message': 'User registered successfully'}
     return jsonify(response), 200
+@app.route('/login', methods=['POST'])
+def login():
+    # Extract login details from the request
+    matric_no = request.form['MATRIC. NO.']
+    name = request.form['NAME']
+    image = request.files['PASSPORT']
+
+    # Load the workbook and select the active sheet
+    try:
+        workbook = load_workbook(excel_file)
+    except FileNotFoundError:
+        response = {'error': 'Attendance data not found'}
+        return jsonify(response), 404
+
+    sheet = workbook.active
+
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        if row[1] == matric_no and row[2] == name:
+            # Load the registered face encoding from the sheet
+            registered_encoding = row[4]  # Assuming the face encoding is in the 5th column
+
+            # Perform face recognition on the provided image
+            img = cv2.imdecode(np.fromstring(image.read(), np.uint8), cv2.IMREAD_UNCHANGED)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+            detected_encoding = face_rec.compute_face_descriptor(gray)
+
+            # Compare the detected encoding with the registered encoding
+            match = np.linalg.norm(np.array(registered_encoding) - np.array(detected_encoding)) < 0.6
+
+            if match:
+                response = {'login_status': True}
+                return jsonify(response), 200
+            else:
+                response = {'login_status': False}
+                return jsonify(response), 200
+
+    response = {'error': 'User not found'}
+    return jsonify(response), 404
+
+
+#mark attendance
+@app.route('/mark', methods=['POST'])
+def mark():
+    # Extract the user details and facial image from the request
+    matric_no = request.form['MATRIC. NO.']
+    name = request.form['NAME']
+    department = request.form['DEPARTMENT']
+    # image = request.files['PASSPORT']
+    
+    # Save the image to a directory or database for future recognition
+    
+    # mark attendance in Excel sheet
+    mark_attendance(matric_no, name, department)
+
+    # Return a success message
+    response = {'message': 'User registered successfully'}
+    return jsonify(response), 200
+
 # Endpoint for recognizing a face and marking attendance
+
 @app.route('/recognize', methods=['POST'])
 def recognize():
     # Extract the facial image from the request
@@ -63,6 +125,8 @@ def view_attendance():
 
 
 #Other modules
+
+#samve registration
 def save_registration_details(matric_no, name, department):
     # Load the workbook or create a new one if it doesn't exist
     try:
@@ -80,25 +144,46 @@ def save_registration_details(matric_no, name, department):
     # Save the workbook
     workbook.save(excel_file)
 
+#preform rocognition
 def perform_facial_recognition(image):
     # Load the registered face encodings and user details from a file or database
     registered_users = load_registered_users()
 
-    # Load the image and convert it to a format suitable for face recognition
-    image_data = face_recognition.load_image_file(image)
-    face_encodings = face_recognition.face_encodings(image_data)
+    # Load a pre-trained face detection model from OpenCV
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-    if len(face_encodings) == 0:
-        # No faces found in the image
-        return None
+    # Load the image and convert it to grayscale
+    img = cv2.imread(image)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Detect faces in the image
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+    for (x, y, w, h) in faces:
+        face_roi = gray[y:y+h, x:x+w]
+        
+        # Perform face recognition on the detected face region
+        recognized_user = recognize_face(face_roi, registered_users)
+        if recognized_user:
+            return recognized_user
+
+    return None
+
+def recognize_face(face_roi, registered_users):
+    # Perform face recognition by comparing face_roi with registered encodings
+    # Calculate the face descriptor for the detected face
+    detected_encoding = face_rec.compute_face_descriptor(face_roi)
 
     for user in registered_users:
         registered_encoding = user['encoding']
-        match = face_recognition.compare_faces([registered_encoding], face_encodings[0])[0]
+        
+        # Compare the detected encoding with the registered encoding
+        match = np.linalg.norm(np.array(registered_encoding) - np.array(detected_encoding)) < 0.6
 
         if match:
-            # Match found, return the user details
             return user
+
+    return None
 
 
 def load_registered_users():
@@ -184,3 +269,7 @@ def load_attendance_data():
         attendance_data.append(user_data)
 
     return attendance_data
+
+
+if __name__ == '__main__':
+    app.run()
