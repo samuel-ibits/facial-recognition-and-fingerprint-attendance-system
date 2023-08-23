@@ -38,7 +38,7 @@ Overall, OpenCV's capabilities allowed you to integrate facial recognition into 
 
 # Steps carried out for fingerprint recognition
 
-here are some few things we considered during the process of bulding
+here are some few things we considered during the process of building
 
 
 
@@ -68,12 +68,10 @@ To implement fingerprint authentication in your React Native app:
 
 5. **User Feedback:** Provide feedback to users during the authentication process, such as showing loading indicators or instructions.
 
-**Considerations:**
+**Considerations that brought about making it multifactor(face and fingers):**
 
-- Ensure you handle cases where devices do not support fingerprint authentication or when the user hasn't set up fingerprints on their device.
-- Always prioritize user privacy and data security when implementing biometric authentication.
-
-Incorporating fingerprint authentication in your React Native app enhances security and user experience. It's a feature users have come to expect in modern mobile apps, and implementing it properly can set your app apart in terms of both security and convenience.
+- handling cases where devices do not support fingerprint authentication or when the user hasn't set up fingerprints on their device.
+- prioritizing user privacy and data security when implementing biometric authentication.
 
 
 # In Summary
