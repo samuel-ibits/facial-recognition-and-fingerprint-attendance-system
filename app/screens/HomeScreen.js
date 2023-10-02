@@ -133,26 +133,24 @@ function HomeScreen({ navigation }) {
           ? ""
           : "Biometrics are not available on this device"}
       </Text>
-      <Text>Welcome to Smart Attendance</Text>
+      <Text style={styles.primaryText}>Welcome to Smart Attendance</Text>
+      <Text style={styles.subText}>matric no</Text>
       <TextInput
         placeholder="Enter Matric No"
         onChangeText={(text) => setMatricNo(text)}
         value={matricNo}
       />
-      <Button
-        title="Login with Biometrics"
+
+      <TouchableOpacity
+        style={styles.touchableOpacity}
         onPress={() => {
           if (matricNo) {
             setBiometryType("Biometrics");
-            useBiometricAuth();
+            handleFingerprintAuth();
           } else {
             Alert.alert("Matric No Missing", "Please enter your Matric No.");
           }
         }}
-      />
-      <TouchableOpacity
-        style={styles.touchableOpacity}
-        onPress={handleFingerprintAuth}
       >
         <Image
           source={require("../assets/Vector(3).png")}
@@ -165,7 +163,14 @@ function HomeScreen({ navigation }) {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={handleFaceIDAuth}
+        onPress={() => {
+          if (matricNo) {
+            setBiometryType("Biometrics");
+            useBiometricAuth();
+          } else {
+            Alert.alert("Matric No Missing", "Please enter your Matric No.");
+          }
+        }}
         style={styles.touchableOpacity}
       >
         <Image
@@ -177,6 +182,15 @@ function HomeScreen({ navigation }) {
           Mark your attendance of the class using your phone camera
         </Text>
       </TouchableOpacity>
+
+      <Button
+        title="Login As A Lecturer"
+        onPress={() => {
+          navigation.navigate("Courserattendancepage", {
+            name: "Available clases today",
+          });
+        }}
+      />
     </View>
   );
 }

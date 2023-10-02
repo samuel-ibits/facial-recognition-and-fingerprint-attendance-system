@@ -29,8 +29,8 @@ const Item = ({ title, subtitle, navigation }) => (
     <TouchableOpacity
       style={styles.button}
       onPress={() =>
-        navigation.navigate("Attendacesignin", {
-          name: "Attendacesignin",
+        navigation.navigate("Attendacesigninfingerprint", {
+          name: "Attendacesigninfingerprint",
         })
       }
     >

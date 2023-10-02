@@ -10,7 +10,119 @@ import {
 
 const { width, height } = Dimensions.get("window");
 
+import * as LocalAuthentication from "expo-local-authentication";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const App = () => {
+  const [isBiometricSupported, setIsBiometricSupported] = useState(false);
+  const [matricNo, setMatricNo] = useState("");
+  const [biometryType, setBiometryType] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      setIsBiometricSupported(compatible);
+    })();
+  }, []);
+
+  const useBiometricAuth = async () => {
+    const savedBiometrics = await LocalAuthentication.isEnrolledAsync();
+    if (!savedBiometrics) {
+      Alert.alert(
+        `No ${biometryType} data found`,
+        `Would you like to enroll your ${biometryType}?`,
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Enroll",
+            onPress: () => {
+              if (biometryType === "Face ID") {
+                handleFaceIDAuth();
+              } else if (biometryType === "Fingerprint") {
+                handleFingerprintAuth();
+              }
+            },
+          },
+        ]
+      );
+      return;
+    }
+
+    try {
+      const biometricAuth = await LocalAuthentication.authenticateAsync({
+        promptMessage: `Login with ${biometryType}`,
+        disableDeviceFallback: false,
+      });
+
+      if (biometricAuth.success) {
+        // Authentication was successful
+        Alert.alert("Authentication Successful", "You are logged in.");
+        // Save Matric No to AsyncStorage
+        await AsyncStorage.setItem("matricNo", matricNo);
+
+        navigation.navigate("HomeScreenstack", {
+          name: "Available clases today",
+        });
+      } else {
+        // Authentication failed or was canceled
+        Alert.alert(
+          "Authentication Failed",
+          "Please try again or use your password."
+        );
+      }
+    } catch (error) {
+      console.error(`Biometric ${biometryType} authentication error:`, error);
+      Alert.alert(
+        "Error",
+        `An error occurred during ${biometryType} authentication.`
+      );
+    }
+  };
+
+  const handleFaceIDAuth = async () => {
+    if (Platform.OS === "ios") {
+      const faceIDSupported =
+        await LocalAuthentication.supportedAuthenticationTypesAsync();
+      if (
+        faceIDSupported.includes(LocalAuthentication.AuthenticationType.FACE)
+      ) {
+        setBiometryType("Face ID");
+        useBiometricAuth();
+      } else {
+        Alert.alert(
+          "Face ID Not Supported",
+          "Face ID is not available on this device."
+        );
+      }
+    } else {
+      Alert.alert(
+        "Face ID Not Supported",
+        "Face ID is only available on iOS devices."
+      );
+    }
+  };
+
+  const handleFingerprintAuth = async () => {
+    const fingerprintIDSupported =
+      await LocalAuthentication.supportedAuthenticationTypesAsync();
+    if (
+      fingerprintIDSupported.includes(
+        LocalAuthentication.AuthenticationType.FINGERPRINT
+      )
+    ) {
+      setBiometryType("Fingerprint");
+      useBiometricAuth();
+    } else {
+      Alert.alert(
+        "Fingerprint Not Supported",
+        "Fingerprint authentication is not available on this device."
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.touchableOpacity}>
