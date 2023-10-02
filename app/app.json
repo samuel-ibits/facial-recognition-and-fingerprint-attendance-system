@@ -21,7 +21,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+        "permissions":["USE_FINGERPRINT", "USE_BIOMETRIC"]
+      
     },
     "web": {
       "favicon": "./assets/favicon.png"
