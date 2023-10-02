@@ -6,6 +6,7 @@ import {
   Text,
   StyleSheet,
   Dimensions,
+  Alert,
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
@@ -13,7 +14,7 @@ const { width, height } = Dimensions.get("window");
 import * as LocalAuthentication from "expo-local-authentication";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const App = () => {
+const App = ({navigation }) => {
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
   const [matricNo, setMatricNo] = useState("");
   const [biometryType, setBiometryType] = useState("");
@@ -59,9 +60,18 @@ const App = () => {
 
       if (biometricAuth.success) {
         // Authentication was successful
-        Alert.alert("Authentication Successful", "You are logged in.");
+        Alert.alert("Attendance Marked Successfully", "You are marked present.");
         // Save Matric No to AsyncStorage
-        await AsyncStorage.setItem("matricNo", matricNo);
+        let course= "mth212";
+let attendance_object = {
+  id: 0,
+  matricNo: "",
+  course_id: course,
+};
+        await AsyncStorage.setItem(
+          "SA@course@" + course,
+          JSON.stringify(attendance_object)
+        );
 
         navigation.navigate("HomeScreenstack", {
           name: "Available clases today",
@@ -130,20 +140,27 @@ const App = () => {
           <Text style={styles.primaryText}>MTh 223</Text>
           <Text style={styles.subText}>Numerical analysis</Text>
         </View>
-
-        <View style={styles.textholder}>
-          <Text style={styles.primaryText}>Fingerprint</Text>
-          <Text style={styles.subText}>
-            Mark your attendance of the class {"\n"} using your fingerprint
-            scanner
-          </Text>
-        </View>
+        <TouchableOpacity onPress={handleFingerprintAuth}>
+          <View style={styles.textholder}>
+            <Text style={styles.primaryText}>Fingerprint</Text>
+            <Text style={styles.subText}>
+              Mark your attendance of the class {"\n"} using your fingerprint
+              scanner
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
-
-    <View style={styles.bottomel}>
-    <Image source={require("../assets/Vector(3).png")} style={styles.image} />
-    <Text style={styles.subText}>Place your hand on your finger sensor</Text>
-    </View>
+  <TouchableOpacity onPress={handleFingerprintAuth}>
+      <View style={styles.bottomel}>
+        <Image
+          source={require("../assets/Vector(3).png")}
+          style={styles.image}
+        />
+        <Text style={styles.subText}>
+          Place your hand on your finger sensor
+        </Text>
+      </View>
+ </TouchableOpacity>
     </View>
   );
 };

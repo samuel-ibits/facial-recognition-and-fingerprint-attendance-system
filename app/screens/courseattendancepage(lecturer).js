@@ -6,6 +6,7 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const data = [
   { id: 1, name: "John Doe", matricNumber: "SCI18CSC223" },
@@ -39,7 +40,7 @@ const App = () => {
       </View>
 
       <View style={styles.touchableOpacity2}>
-        <Text style={styles.textLeft2}>Total number of students</Text>
+        <Text style={styles.textLeft2}>Total number of students present</Text>
         <Text style={styles.textRight2}>150</Text>
       </View>
 

@@ -6,19 +6,18 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const data = [
-  { id: 1, title: "MTH 223", subtitle: "Numerical Analysis" },
-  { id: 2, title: "MTH 223", subtitle: "Numerical Analysis" },
-  { id: 3, title: "MTH 223", subtitle: "Numerical Analysis" },
-  { id: 4, title: "MTH 223", subtitle: "Numerical Analysis" },
-  { id: 5, title: "MTH 223", subtitle: "Numerical Analysis" },
-  { id: 6, title: "MTH 223", subtitle: "Numerical Analysis" },
-  { id: 7, title: "MTH 223", subtitle: "Numerical Analysis" },
-  { id: 9, title: "MTH 223", subtitle: "Numerical Analysis" },
-  { id: 10, title: "MTH 223", subtitle: "Numerical Analysis" },
-];
+const data = [{ id: 1, title: "MTH 223", subtitle: "Numerical Analysis" }];
 
+const handleCourse = async () => {
+  // console.log(course);
+  // await AsyncStorage.setItem("SA@event", course);
+
+  navigation.navigate("Attendacesigninfingerprint", {
+    name: "Attendacesigninfingerprint",
+  });
+};
 const Item = ({ title, subtitle, navigation }) => (
   <View style={styles.item}>
     <View style={styles.textContainer}>
@@ -28,11 +27,11 @@ const Item = ({ title, subtitle, navigation }) => (
 
     <TouchableOpacity
       style={styles.button}
-      onPress={() =>
+      onPress={() => {
         navigation.navigate("Attendacesigninfingerprint", {
           name: "Attendacesigninfingerprint",
-        })
-      }
+        });
+      }}
     >
       <Text style={styles.buttonText}>View</Text>
     </TouchableOpacity>

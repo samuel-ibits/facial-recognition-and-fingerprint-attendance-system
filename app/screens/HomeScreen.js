@@ -10,6 +10,7 @@ import {
   Text,
   StyleSheet,
   Dimensions,
+  ScrollView,
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
@@ -64,7 +65,16 @@ function HomeScreen({ navigation }) {
         // Authentication was successful
         Alert.alert("Authentication Successful", "You are logged in.");
         // Save Matric No to AsyncStorage
-        await AsyncStorage.setItem("matricNo", matricNo);
+        let user_object = {
+          id: 0,
+          matricNo: matricNo,
+          valid: true,
+        };
+        await AsyncStorage.setItem(
+          "SA@user",
+          JSON.stringify(user_object)
+        );
+      
 
         navigation.navigate("HomeScreenstack", {
           name: "Available clases today",
@@ -127,71 +137,73 @@ function HomeScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text>
-        {isBiometricSupported
-          ? ""
-          : "Biometrics are not available on this device"}
-      </Text>
-      <Text style={styles.primaryText}>Welcome to Smart Attendance</Text>
-      <Text style={styles.subText}>matric no</Text>
-      <TextInput
-        placeholder="Enter Matric No"
-        onChangeText={(text) => setMatricNo(text)}
-        value={matricNo}
-      />
-
-      <TouchableOpacity
-        style={styles.touchableOpacity}
-        onPress={() => {
-          if (matricNo) {
-            setBiometryType("Biometrics");
-            handleFingerprintAuth();
-          } else {
-            Alert.alert("Matric No Missing", "Please enter your Matric No.");
-          }
-        }}
-      >
-        <Image
-          source={require("../assets/Vector(3).png")}
-          style={styles.image}
-        />
-        <Text style={styles.primaryText}>Fingerprint</Text>
-        <Text style={styles.subText}>
-          Mark your attendance of the class using your fingerprint scanner
+    <ScrollView>
+      <View style={styles.container}>
+        <Text>
+          {isBiometricSupported
+            ? ""
+            : "Biometrics are not available on this device"}
         </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => {
-          if (matricNo) {
-            setBiometryType("Biometrics");
-            useBiometricAuth();
-          } else {
-            Alert.alert("Matric No Missing", "Please enter your Matric No.");
-          }
-        }}
-        style={styles.touchableOpacity}
-      >
-        <Image
-          source={require("../assets/Rectangle.png")}
-          style={styles.image}
+        <Text style={styles.primaryText}>Welcome to Smart Attendance</Text>
+        <Text style={styles.subText}>matric no</Text>
+        <TextInput
+          placeholder="Enter Matric No"
+          onChangeText={(text) => setMatricNo(text)}
+          value={matricNo}
         />
-        <Text style={styles.primaryText}>Facial recognition</Text>
-        <Text style={styles.subText}>
-          Mark your attendance of the class using your phone camera
-        </Text>
-      </TouchableOpacity>
 
-      <Button
-        title="Login As A Lecturer"
-        onPress={() => {
-          navigation.navigate("Courserattendancepage", {
-            name: "Available clases today",
-          });
-        }}
-      />
-    </View>
+        <TouchableOpacity
+          style={styles.touchableOpacity}
+          onPress={() => {
+            if (matricNo) {
+              setBiometryType("Biometrics");
+              handleFingerprintAuth();
+            } else {
+              Alert.alert("Matric No Missing", "Please enter your Matric No.");
+            }
+          }}
+        >
+          <Image
+            source={require("../assets/Vector(3).png")}
+            style={styles.image}
+          />
+          <Text style={styles.primaryText}>Fingerprint</Text>
+          <Text style={styles.subText}>
+            Mark your attendance of the class using your fingerprint scanner
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            if (matricNo) {
+              setBiometryType("Biometrics");
+              useBiometricAuth();
+            } else {
+              Alert.alert("Matric No Missing", "Please enter your Matric No.");
+            }
+          }}
+          style={styles.touchableOpacity}
+        >
+          <Image
+            source={require("../assets/Rectangle.png")}
+            style={styles.image}
+          />
+          <Text style={styles.primaryText}>Facial recognition</Text>
+          <Text style={styles.subText}>
+            Mark your attendance of the class using your phone camera
+          </Text>
+        </TouchableOpacity>
+
+        <Button
+          title="Login As A Lecturer"
+          onPress={() => {
+            navigation.navigate("Courserattendancepage", {
+              name: "Available clases today",
+            });
+          }}
+        />
+      </View>
+    </ScrollView>
   );
 }
 

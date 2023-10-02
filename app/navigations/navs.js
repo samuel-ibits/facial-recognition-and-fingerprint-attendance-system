@@ -29,7 +29,7 @@ const Navs = () => {
         <Stack.Screen
           name="HomeScreenstack"
           component={Courselist}
-          ptions={{ title: "Welcome" }}
+          options={{ title: "Course list" }}
         />
         <Stack.Screen
           name="Attendacesignin"
@@ -39,7 +39,7 @@ const Navs = () => {
         <Stack.Screen
           name="Attendacesigninfingerprint"
           component={Attendacesigninfingerprint}
-          options={{ title: "Welcome" }}
+          options={{ title: "Mark Attendance" }}
         />
         <Stack.Screen
           name="Courserattendancepage"
