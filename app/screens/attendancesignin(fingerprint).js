@@ -62,12 +62,15 @@ const App = ({navigation }) => {
         // Authentication was successful
         Alert.alert("Attendance Marked Successfully", "You are marked present.");
         // Save Matric No to AsyncStorage
-        let course= "mth212";
+        
+        let user=  await AsyncStorage.getItem("SA@user");
+        let course = await AsyncStorage.getItem("SA@event");
 let attendance_object = {
   id: 0,
-  matricNo: "",
-  course_id: course,
+  matricNumber:  user.matric,
+  course: course,
 };
+
         await AsyncStorage.setItem(
           "SA@course@" + course,
           JSON.stringify(attendance_object)

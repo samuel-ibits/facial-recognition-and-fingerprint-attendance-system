@@ -23,37 +23,36 @@ const data = [
   { id: 12, name: "Alice Johnson", matricNumber: "SCI18CSC225" },
   { id: 13, name: "Alice Johnson", matricNumber: "SCI18CSC225" },
 ];
+const App = async () => {
+  const course = await AsyncStorage.getItem("SA@event");
+  const data2 = [
+    await AsyncStorage.getItem("SA@course@" + JSON.stringify(course)),
+  ];
+  console.log("data", data2);
 
-const App = () => {
   const renderItem = ({ item }) => (
     <View style={styles.listItem}>
-      <Text style={styles.name}>{item.name}</Text>
+      {/* <Text style={styles.name}>{item.name}</Text> */}
       <Text style={styles.matricNumber}>{item.matricNumber}</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.touchableOpacity}>
-        <Text style={styles.textLeft}>Total number of students</Text>
-        <Text style={styles.textRight}>180</Text>
-      </View>
-
       <View style={styles.touchableOpacity2}>
         <Text style={styles.textLeft2}>Total number of students present</Text>
-        <Text style={styles.textRight2}>150</Text>
+        {/* <Text style={styles.textRight2}>150</Text> */}
       </View>
-
       <View style={styles.listholder}>
         <View style={styles.header}>
-          <Text style={styles.headerText2}>Name</Text>
+          {/* <Text style={styles.headerText2}>Name</Text> */}
           <Text style={styles.headerText}>Matric Number</Text>
         </View>
 
         <View style={styles.separator} />
 
         <FlatList
-          data={data}
+          data={data2}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
         />

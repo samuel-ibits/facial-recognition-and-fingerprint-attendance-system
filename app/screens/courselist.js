@@ -10,35 +10,34 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const data = [{ id: 1, title: "MTH 223", subtitle: "Numerical Analysis" }];
 
-const handleCourse = async () => {
-  // console.log(course);
-  // await AsyncStorage.setItem("SA@event", course);
+function Courselist({ navigation }) {
 
-  navigation.navigate("Attendacesigninfingerprint", {
-    name: "Attendacesigninfingerprint",
-  });
-};
-const Item = ({ title, subtitle, navigation }) => (
-  <View style={styles.item}>
-    <View style={styles.textContainer}>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{subtitle}</Text>
+
+  const handleCourse = async (course) => {
+    console.log(course);
+    // save the course
+    await AsyncStorage.setItem("SA@event", JSON.stringify("mth223"));
+
+    navigation.navigate("Attendacesigninfingerprint", {
+      name: "Attendacesigninfingerprint",
+    });
+  };
+  const Item = ({ title, subtitle, navigation }) => (
+    <View style={styles.item}>
+      <View style={styles.textContainer}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.subtitle}>{subtitle}</Text>
+      </View>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={({title}) => handleCourse({title})}
+      >
+        <Text style={styles.buttonText}>View</Text>
+      </TouchableOpacity>
     </View>
+  );
 
-    <TouchableOpacity
-      style={styles.button}
-      onPress={() => {
-        navigation.navigate("Attendacesigninfingerprint", {
-          name: "Attendacesigninfingerprint",
-        });
-      }}
-    >
-      <Text style={styles.buttonText}>View</Text>
-    </TouchableOpacity>
-  </View>
-);
-
-const App = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <Item title={item.title} subtitle={item.subtitle} navigation={navigation} />
   );
@@ -52,8 +51,7 @@ const App = ({ navigation }) => {
       />
     </View>
   );
-};
-
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -95,4 +93,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default Courselist;

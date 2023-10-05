@@ -16,11 +16,14 @@ import {
 const { width, height } = Dimensions.get("window");
 import * as LocalAuthentication from "expo-local-authentication";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CameraScreen from "../componets/CameraScreen";
 
 function HomeScreen({ navigation }) {
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
   const [matricNo, setMatricNo] = useState("");
   const [biometryType, setBiometryType] = useState("");
+  const [cameraVisible, setCameraVisible] = useState(false);
+  const [capturedImageData, setCapturedImageData] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -28,6 +31,52 @@ function HomeScreen({ navigation }) {
       setIsBiometricSupported(compatible);
     })();
   }, []);
+
+  function HandleCameraState(state) {
+    setCameraVisible('false');
+    console.log("came back", state, cameraVisible);
+  }
+
+  async function HandleCameraStateNext() {
+    await AsyncStorage.setItem("SA@user", JSON.stringify(matricNo));
+
+    navigation.navigate("HomeScreenstack", {
+      name: "Available clases today",
+    });
+    console.log("came back next", matricNo);
+  }
+  function takePicture(camera) {
+    const options = { quality: 0.5, base64: true };
+
+    camera
+      .takePictureAsync(options)
+      .then((data) => {
+        // Send the captured image to the server for comparison
+        sendImageToServer(data.base64);
+      })
+      .catch((error) => {
+        console.error("Error taking picture: ", error);
+      });
+  }
+
+  function sendImageToServer(base64Image) {
+    const apiUrl = "https://<region>.opencv.fr/compare"; // Replace with the actual API endpoint
+    const requestData = {
+      image: base64Image,
+      // Add any other data required by the server here
+    };
+
+    axios
+      .post(apiUrl, requestData)
+      .then((response) => {
+        // Handle the response from the server
+        console.log("Server Response:", response.data);
+        // You can update the UI based on the response if needed
+      })
+      .catch((error) => {
+        console.error("Error sending image to server: ", error);
+      });
+  }
 
   const useBiometricAuth = async () => {
     const savedBiometrics = await LocalAuthentication.isEnrolledAsync();
@@ -67,14 +116,10 @@ function HomeScreen({ navigation }) {
         // Save Matric No to AsyncStorage
         let user_object = {
           id: 0,
-          matricNo: matricNo,
+          matricNumber: matricNo,
           valid: true,
         };
-        await AsyncStorage.setItem(
-          "SA@user",
-          JSON.stringify(user_object)
-        );
-      
+        await AsyncStorage.setItem("SA@user", JSON.stringify(user_object));
 
         navigation.navigate("HomeScreenstack", {
           name: "Available clases today",
@@ -137,73 +182,91 @@ function HomeScreen({ navigation }) {
   };
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Text>
-          {isBiometricSupported
-            ? ""
-            : "Biometrics are not available on this device"}
-        </Text>
-        <Text style={styles.primaryText}>Welcome to Smart Attendance</Text>
-        <Text style={styles.subText}>matric no</Text>
-        <TextInput
-          placeholder="Enter Matric No"
-          onChangeText={(text) => setMatricNo(text)}
-          value={matricNo}
+    <>
+      {cameraVisible == true ? (
+        <CameraScreen
+          HandleCameraState = { HandleCameraState }
+            next ={ HandleCameraStateNext }
+            matricNumber = {matricNo}
+          
         />
+      ) : (
+        <ScrollView>
+          <View style={styles.container}>
+            <Text>
+              {isBiometricSupported
+                ? ""
+                : "Biometrics are not available on this device"}
+            </Text>
+            <Text style={styles.primaryText}>Welcome to Smart Attendance</Text>
+            <Text style={styles.subText}>matric no</Text>
+            <TextInput
+              placeholder="Enter Matric No"
+              onChangeText={(text) => setMatricNo(text)}
+              value={matricNo}
+            />
 
-        <TouchableOpacity
-          style={styles.touchableOpacity}
-          onPress={() => {
-            if (matricNo) {
-              setBiometryType("Biometrics");
-              handleFingerprintAuth();
-            } else {
-              Alert.alert("Matric No Missing", "Please enter your Matric No.");
-            }
-          }}
-        >
-          <Image
-            source={require("../assets/Vector(3).png")}
-            style={styles.image}
-          />
-          <Text style={styles.primaryText}>Fingerprint</Text>
-          <Text style={styles.subText}>
-            Mark your attendance of the class using your fingerprint scanner
-          </Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.touchableOpacity}
+              onPress={() => {
+                if (matricNo) {
+                  setBiometryType("Biometrics");
+                  handleFingerprintAuth();
+                } else {
+                  Alert.alert(
+                    "Matric No Missing",
+                    "Please enter your Matric No."
+                  );
+                }
+              }}
+            >
+              <Image
+                source={require("../assets/Vector(3).png")}
+                style={styles.image}
+              />
+              <Text style={styles.primaryText}>Fingerprint</Text>
+              <Text style={styles.subText}>
+                Mark your attendance of the class using your fingerprint scanner
+              </Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => {
-            if (matricNo) {
-              setBiometryType("Biometrics");
-              useBiometricAuth();
-            } else {
-              Alert.alert("Matric No Missing", "Please enter your Matric No.");
-            }
-          }}
-          style={styles.touchableOpacity}
-        >
-          <Image
-            source={require("../assets/Rectangle.png")}
-            style={styles.image}
-          />
-          <Text style={styles.primaryText}>Facial recognition</Text>
-          <Text style={styles.subText}>
-            Mark your attendance of the class using your phone camera
-          </Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                if (matricNo) {
+                  // setBiometryType("Biometrics");
+                  // useBiometricAuth();
+                  setCameraVisible(true);
+                } else {
+                  Alert.alert(
+                    "Matric No Missing",
+                    "Please enter your Matric No."
+                  );
+                }
+              }}
+              style={styles.touchableOpacity}
+            >
+              <Image
+                source={require("../assets/Rectangle.png")}
+                style={styles.image}
+              />
+              <Text style={styles.primaryText}>Facial recognition</Text>
+              <Text style={styles.subText}>
+                Mark your attendance of the class using your phone camera
+              </Text>
+            </TouchableOpacity>
 
-        <Button
-          title="Login As A Lecturer"
-          onPress={() => {
-            navigation.navigate("Courserattendancepage", {
-              name: "Available clases today",
-            });
-          }}
-        />
-      </View>
-    </ScrollView>
+            <Button
+              title="Login As A Lecturer"
+              onPress={() => {
+                navigation.navigate("Courserattendancepage", {
+                  name: "Available clases today",
+                });
+              }}
+            />
+          </View>
+        </ScrollView>
+      )}
+    </>
   );
 }
 
