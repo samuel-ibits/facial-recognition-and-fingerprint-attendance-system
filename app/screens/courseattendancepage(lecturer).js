@@ -47,6 +47,7 @@ const App = () => {
       <View style={styles.listholder}>
         <View style={styles.header}>
           <Text style={styles.headerText}>{course}</Text>
+          <Text style={styles.headerText}>{"6th October, 2023."}</Text>
         </View>
         <View style={styles.header}>
           <Text style={styles.headerText}>Matric Number</Text>
