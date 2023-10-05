@@ -17,7 +17,7 @@ const App = () => {
     AsyncStorage.getItem("SA@event")
       .then((courseData) => {
         if (courseData) {
-          setCourse(courseData);
+          setCourse(JSON.parse(courseData));
           // Fetch the corresponding student data based on the course
           return AsyncStorage.getItem(`SA@course@${courseData}`);
         }
