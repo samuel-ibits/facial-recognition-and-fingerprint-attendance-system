@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
+import { ImageManipulator } from "expo";
 
 function CameraScreen({ HandleCameraState, next, matricNumber }) {
   const [imageUri, setImageUri] = useState(null);
@@ -31,15 +32,46 @@ function CameraScreen({ HandleCameraState, next, matricNumber }) {
       });
 
       if (!result.canceled) {
-        setImageUri(result.assets[0].uri);
-        sendImageToServer(result.assets[0].uri);
+        // console.log(result);
+        const base64Image = await imageToBase64(result.assets[0].uri);
+        setImageUri(result.uri);
+        sendImageToServer(base64Image);
       }
     } catch (error) {
       console.error("Error taking picture: ", error);
     }
   };
+  async function imageToBase64(imageUri) {
+    try {
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      const byteArray = await new Response(blob).arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(byteArray)));
+      return base64;
+    } catch (error) {
+      console.error("Error converting image to base64:", error);
+      return null;
+    }
+  }
+
+  const convertImageToBase64 = async (imageUri) => {
+    try {
+      console.log(imageUri);
+      const manipResult = await ImageManipulator.manipulateAsync(
+        imageUri,
+        [{ resize: { width: 800, height: 600 } }], // Resize the image as needed
+        { format: "jpeg", base64: true }
+      );
+      console.log(manipResult.base64);
+      return manipResult.base64;
+    } catch (error) {
+      console.error("Error converting image to base64: ", error);
+      return null;
+    }
+  };
 
   const sendImageToServer = async (imageUri) => {
+    console.log("url", imageUri);
     const apiUrl = "https://eu.opencv.fr/search";
 
     try {

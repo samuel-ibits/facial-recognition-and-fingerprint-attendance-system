@@ -14,7 +14,7 @@ const { width, height } = Dimensions.get("window");
 import * as LocalAuthentication from "expo-local-authentication";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const App = ({navigation }) => {
+const App = ({ navigation }) => {
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
   const [matricNo, setMatricNo] = useState("");
   const [biometryType, setBiometryType] = useState("");
@@ -60,16 +60,22 @@ const App = ({navigation }) => {
 
       if (biometricAuth.success) {
         // Authentication was successful
-        Alert.alert("Attendance Marked Successfully", "You are marked present.");
+        Alert.alert(
+          "Attendance Marked Successfully",
+          "You are marked present."
+        );
         // Save Matric No to AsyncStorage
-        
-        let user=  await AsyncStorage.getItem("SA@user");
+
+        let user = await AsyncStorage.getItem("SA@user");
         let course = await AsyncStorage.getItem("SA@event");
-let attendance_object = {
-  id: 0,
-  matricNumber:  user.matric,
-  course: course,
-};
+        console.log(user);
+        let attendance_object = {
+          id: 0,
+          matricNumber: user.matricNumber,
+          course: course,
+        };
+
+        console.log(attendance_object);
 
         await AsyncStorage.setItem(
           "SA@course@" + course,
@@ -153,17 +159,17 @@ let attendance_object = {
           </View>
         </TouchableOpacity>
       </View>
-  <TouchableOpacity onPress={handleFingerprintAuth}>
-      <View style={styles.bottomel}>
-        <Image
-          source={require("../assets/Vector(3).png")}
-          style={styles.image}
-        />
-        <Text style={styles.subText}>
-          Place your hand on your finger sensor
-        </Text>
-      </View>
- </TouchableOpacity>
+      <TouchableOpacity onPress={handleFingerprintAuth}>
+        <View style={styles.bottomel}>
+          <Image
+            source={require("../assets/Vector(3).png")}
+            style={styles.image}
+          />
+          <Text style={styles.subText}>
+            Place your hand on your finger sensor
+          </Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -176,11 +182,11 @@ const styles = StyleSheet.create({
     gap: 20,
     marginVertical: 30,
   },
-  bottomel:{
-    justifyContent:'center',
-    alignItems:'center'
-  }
-  ,touchableOpacity: {
+  bottomel: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  touchableOpacity: {
     width: width / 1.1,
     height: height / 2.8,
     paddingVertical: 20,
