@@ -18,14 +18,40 @@ const App = ({ navigation }) => {
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
   const [matricNo, setMatricNo] = useState("");
   const [biometryType, setBiometryType] = useState("");
+  const [CurrentTime,setCurrentTime]= useState('');
 
   useEffect(() => {
     (async () => {
       const compatible = await LocalAuthentication.hasHardwareAsync();
       setIsBiometricSupported(compatible);
     })();
+
+    // Function to get the current time
+    const getCurrentTime = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+
+      // Format the time as HH:MM:SS
+      const formattedTime = `${String(hours).padStart(2, "0")}:${String(
+        minutes
+      ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+      setCurrentTime(formattedTime);
+    };
+    getCurrentTime();
+
+    // Update the time every second (1000 milliseconds)
+    const intervalId = setInterval(getCurrentTime, 1000);
+
+    // Clean up the interval when the component unmounts
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
+console.log(CurrentTime);
   const useBiometricAuth = async () => {
     const savedBiometrics = await LocalAuthentication.isEnrolledAsync();
     if (!savedBiometrics) {
@@ -73,6 +99,7 @@ const App = ({ navigation }) => {
           id: 0,
           matricNumber: user.matricNumber,
           course: course,
+          time: CurrentTime,
         };
 
         console.log(attendance_object);

@@ -56,6 +56,7 @@ const App = () => {
         <View style={styles.separator} />
         <View style={styles.listItem}>
           <Text style={styles.matricNumber}>{studentData.matricNumber}</Text>
+          <Text style={styles.matricNumber}>{studentData.time}</Text>
         </View>
         <FlatList
           data={studentData} // Use the parsed student data here
