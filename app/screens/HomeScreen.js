@@ -33,12 +33,16 @@ function HomeScreen({ navigation }) {
   }, []);
 
   function HandleCameraState(state) {
-    setCameraVisible('false');
+    setCameraVisible("false");
     console.log("came back", state, cameraVisible);
   }
-
+  let user_object = {
+    id: 0,
+    matricNumber: matricNo,
+    valid: true,
+  };
   async function HandleCameraStateNext() {
-    await AsyncStorage.setItem("SA@user", JSON.stringify(matricNo));
+    await AsyncStorage.setItem("SA@user", JSON.stringify(user_object));
 
     navigation.navigate("HomeScreenstack", {
       name: "Available clases today",
@@ -185,10 +189,9 @@ function HomeScreen({ navigation }) {
     <>
       {cameraVisible == true ? (
         <CameraScreen
-          HandleCameraState = { HandleCameraState }
-            next ={ HandleCameraStateNext }
-            matricNumber = {matricNo}
-          
+          HandleCameraState={HandleCameraState}
+          next={HandleCameraStateNext}
+          matricNumber={matricNo}
         />
       ) : (
         <ScrollView>

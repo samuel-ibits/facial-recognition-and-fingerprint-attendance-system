@@ -66,7 +66,7 @@ const App = ({ navigation }) => {
         );
         // Save Matric No to AsyncStorage
 
-        let user = await AsyncStorage.getItem("SA@user");
+        let user = JSON.parse(await AsyncStorage.getItem("SA@user"));
         let course = await AsyncStorage.getItem("SA@event");
         console.log(user);
         let attendance_object = {

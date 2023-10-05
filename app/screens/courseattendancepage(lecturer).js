@@ -38,7 +38,7 @@ const App = () => {
   // Render each item in the FlatList
   const renderItem = ({ item }) => (
     <View style={styles.listItem}>
-      <Text style={styles.matricNumber}>{item.course}</Text>
+      <Text style={styles.matricNumber}>{item.matricNumber}</Text>
     </View>
   );
 
